@@ -13,6 +13,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": "../public",
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
@@ -75,6 +76,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
+
             "polyfills": [
               "zone.js",
               "zone.js/testing"
@@ -87,11 +89,18 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+            ],
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

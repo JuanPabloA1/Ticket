@@ -1,0 +1,129 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">
+      <i class="bi bi-receipt-cutoff me-2"></i>Sistema de Ventas
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+          <a class="nav-link active" routerLink="/vender">Vender</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/historial">Historial</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle me-1"></i>
+            {{ currentUser?.username || 'Usuario' }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><button class="dropdown-item" (click)="logout()">Cerrar Sesión</button></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container-fluid p-4 bg-light vh-100">
+  <div class="row g-4 h-100">
+
+    <div class="col-lg-7 d-flex flex-column">
+      <div class="card flex-grow-1 shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+          <h2 class="card-title h4 border-bottom pb-3 mb-4">
+            <i class="bi bi-pencil-square me-2"></i>Crear Nueva Boleta
+          </h2>
+
+          <form #ticketForm="ngForm" (ngSubmit)="submitTicket()">
+            <div class="mb-3">
+              <label for="customerName" class="form-label">Nombre del Cliente</label>
+              <input type="text" id="customerName" name="customerName" class="form-control" [(ngModel)]="newTicket.customerName" required>
+            </div>
+
+            <fieldset class="border p-3 rounded-3 mb-4">
+              <legend class="float-none w-auto px-2 h6">Añadir Jugada</legend>
+              <div class="row g-2 align-items-end">
+                <div class="col-5">
+                  <label for="number" class="form-label">Número</label>
+                  <input type="text" id="number" name="number" class="form-control" [(ngModel)]="currentPlay.number" placeholder="Ej: 25">
+                </div>
+                <div class="col-5">
+                  <label for="amount" class="form-label">Monto</label>
+                  <input type="number" id="amount" name="amount" class="form-control" [(ngModel)]="currentPlay.amount" placeholder="Ej: 1000">
+                </div>
+                <div class="col-2 d-grid">
+                  <button type="button" class="btn btn-secondary" (click)="addPlay()" [disabled]="!currentPlay.number || !currentPlay.amount">
+                    <i class="bi bi-plus-lg">Generar</i>
+                  </button>
+                </div>
+              </div>
+            </fieldset>
+
+            <h3 class="h6 mb-3">Jugadas en esta Boleta</h3>
+            <ul class="list-group mb-3" *ngIf="newTicket.plays.length > 0; else noPlays">
+              <li *ngFor="let play of newTicket.plays; let i = index" class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="fw-bold">Número: {{ play.number }}</span>
+                  <span class="text-muted ms-3">Monto: {{ play.amount | currency:'COP':'$':'1.0-0' }}</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removePlay(i)">
+                  <i class="bi bi-trash">x</i>
+                </button>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center bg-primary text-white">
+                <strong class="h5 mb-0">TOTAL</strong>
+                <strong class="h5 mb-0">{{ getTotal() | currency:'COP':'$':'1.0-0' }}</strong>
+              </li>
+            </ul>
+            <ng-template #noPlays>
+              <div class="alert alert-info text-center">Aún no has añadido jugadas.</div>
+            </ng-template>
+
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="ticketForm.invalid || newTicket.plays.length === 0">
+                Vender e Imprimir Boleta
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5 d-flex flex-column">
+      <div class="card flex-grow-1 shadow-sm border-0 rounded-3">
+        <div class="card-body p-4 d-flex flex-column">
+          <h2 class="card-title h4 border-bottom pb-3 mb-4">
+            <i class="bi bi-table me-2"></i>Estado de Números
+          </h2>
+          <div class="table-responsive flex-grow-1">
+            <table class="table table-bordered table-striped table-hover text-center">
+              <thead class="table-dark sticky-top">
+                <tr>
+                  <th>Número</th>
+                  <th>Monto Disponible</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of numberAvailability">
+                  <td class="fw-bold">{{ item.number }}</td>
+                  <td>{{ item.availableAmount | currency:'COP':'$':'1.0-0' }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="item.availableAmount > 0 ? 'bg-success' : 'bg-danger'">
+                      {{ item.availableAmount > 0 ? 'Disponible' : 'Agotado' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
