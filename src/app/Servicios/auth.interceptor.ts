@@ -1,6 +1,6 @@
 // src/app/Servicios/auth.interceptor.ts
-import { HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
