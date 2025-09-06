@@ -1,39 +1,49 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
+
+  // 🔒 Solo acceder a localStorage si estamos en navegador
+  if (!isPlatformBrowser(platformId)) {
+    router.navigate(['/login']);
+    return false;
+  }
+
   const token = sessionStorage.getItem('token');
   const userString = sessionStorage.getItem('loggedInUser');
 
-  // 1. Si no hay token, no está logueado. Lo enviamos al login.
+  // 1. Si no hay token o usuario, no está logueado.
   if (!token || !userString) {
     router.navigate(['/login']);
     return false;
   }
 
   // 2. Obtenemos los datos del usuario y los roles permitidos para esta ruta.
-  const user = JSON.parse(userString);
-  const allowedRoles = route.data['roles'] as Array<string>;
+  let user: any;
+  try {
+    user = JSON.parse(userString);
+  } catch (e) {
+    console.error("Error al parsear loggedInUser:", e);
+    router.navigate(['/login']);
+    return false;
+  }
 
-  // 3. Verificamos que el usuario TENGA una propiedad de rol y la convertimos a minúsculas.
-  // Si user.role no existe, asignamos un string vacío para evitar errores.
+  const allowedRoles = route.data['roles'] as Array<string>;
   const userRole = user.role ? user.role.toLowerCase() : '';
 
-  // Imprimimos en consola para depurar fácilmente si algo sigue fallando.
   console.log("Rol del usuario:", userRole);
   console.log("Roles permitidos:", allowedRoles);
-  console.log(allowedRoles && !allowedRoles.includes(userRole));
 
-
-  // 4. Si la ruta requiere roles y el rol del usuario (en minúsculas) no está en la lista...
+  // 3. Verificamos roles
   if (allowedRoles && !allowedRoles.includes(userRole)) {
     alert('No tienes permiso para acceder a esta página.');
-    // Lo redirigimos a una página segura (su página de inicio por defecto).
     router.navigate(['/vender']);
     return false;
   }
 
-  // 4. Si todo está bien, le permitimos el acceso.
+  // ✅ Todo bien
   return true;
 };

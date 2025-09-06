@@ -13,7 +13,6 @@ export class ApiService {
 
   // --- MÉTODOS PÚBLICOS (Sin Token) ---
   login(credentials: any): Observable<any> {
-    console.log('Enviando credenciales al backend:', credentials);
     return this.http.post(`${this.API_URL}/auth/login`, credentials);
   }
 
@@ -41,17 +40,14 @@ export class ApiService {
   }
 
   getNumbers(): Observable<any> {
-    console.log('Pidiendo números al backend...');
     return this.http.get(`${this.API_URL}/numbers`, { headers: this.getAuthHeaders() });
   }
 
   createTicket(ticketData: any): Observable<any> {
-    console.log('Enviando nueva boleta al backend:', ticketData);
     return this.http.post(`${this.API_URL}/tickets`, ticketData, { headers: this.getAuthHeaders() });
   }
 
   getHistory(): Observable<any> {
-    console.log('Pidiendo historial al backend...');
     return this.http.get(`${this.API_URL}/history`, { headers: this.getAuthHeaders() });
   }
 

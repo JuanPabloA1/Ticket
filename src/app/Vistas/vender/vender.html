@@ -12,7 +12,8 @@
           <a class="nav-link active" routerLink="/vender">Vender</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/historial">Historial</a>
+          <!-- <a class="nav-link" routerLink="/historial">Historial</a> -->
+          <a class="nav-link" routerLink="/historial" routerLinkActive="active">Historial</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown">
@@ -82,6 +83,10 @@
             <ng-template #noPlays>
               <div class="alert alert-info text-center">Aún no has añadido jugadas.</div>
             </ng-template>
+
+            @if (ticketForm.invalid) {
+              <div class="alert alert-danger text-center">Falta digitar el nombre del cliente.</div>
+            }
 
             <div class="d-grid mt-4">
               <button type="submit" class="btn btn-primary btn-lg" [disabled]="ticketForm.invalid || newTicket.plays.length === 0">

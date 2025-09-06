@@ -1,37 +1,39 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../Servicios/api.service';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
   standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
-  imports: [CommonModule, FormsModule],
   styleUrls: ['./login.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   credentials = { username: '', password: '' };
-  errorMessage = '';
+  public errorMessage: string | null = null; // Variable para mostrar el mensaje de error
 
   constructor(private apiService: ApiService, private router: Router) {}
 
-  onLogin(): void {
+  ngOnInit(): void {
+    sessionStorage.clear();
+  }
+
+  login(): void {
+    this.errorMessage = null; // Limpiar cualquier mensaje de error anterior
     this.apiService.login(this.credentials).subscribe({
-      // 3. Los parámetros con la etiqueta ": any"
-      next: (response: any) => {
-        console.log('Respuesta del backend (login exitoso):', response);
-
-        sessionStorage.setItem('loggedInUser', JSON.stringify(response.user));
+      next: (response) => {
         sessionStorage.setItem('token', response.token);
-
+        sessionStorage.setItem('loggedInUser', JSON.stringify(response.user));
         this.router.navigate(['/vender']);
       },
-      // 3. Los parámetros con la etiqueta ": any"
-      error: (err: any) => {
-        console.error('Error del backend:', err);
-        this.errorMessage = err.error.message || 'No se pudo conectar con el servidor.';
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Credenciales incorrectas.';
       }
     });
   }

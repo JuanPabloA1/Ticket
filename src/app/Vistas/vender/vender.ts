@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ApiService } from '../../Servicios/api.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -32,7 +32,7 @@ interface Ticket {
   selector: 'app-vender',
   standalone: true,
   // ¡Añade esta línea de imports!
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './vender.html', // Pronto corregiremos esto también
   styleUrls: ['./vender.css'],
 })
@@ -124,49 +124,60 @@ export class VenderComponent implements OnInit {
   }
 
   submitTicket(): void {
-  const ticketData = {
-    customerName: this.newTicket.customerName,
-    plays: this.newTicket.plays,
-    total: this.getTotal(),
-  };
+    const ticketData = {
+      customerName: this.newTicket.customerName,
+      plays: this.newTicket.plays,
+      total: this.getTotal(),
+    };
 
-  this.apiService.createTicket(ticketData).pipe(
-    // 1. switchMap recibe la respuesta de createTicket (savedTicketResponse)
-    switchMap((savedTicketResponse) => {
-      console.log('Venta guardada:', savedTicketResponse);
-      // 2. Y devuelve el siguiente observable que quieres ejecutar
-      return this.apiService.printTicket(ticketData);
-    })
-    // 3. La suscripción se hace al final de toda la cadena
-  ).subscribe({
-    // El 'next' aquí recibirá el valor emitido por printTicket (el pdfBlob)
-    next: (pdfBlob) => {
-      console.log('Blob del PDF recibido:', pdfBlob); // Este console.log ahora debería funcionar
+    this.apiService
+      .createTicket(ticketData)
+      .pipe(
+        // 1. switchMap recibe la respuesta de createTicket (savedTicketResponse)
+        switchMap((savedTicketResponse) => {
+          console.log('Venta guardada:', savedTicketResponse);
+          // 2. Y devuelve el siguiente observable que quieres ejecutar
+          return this.apiService.printTicket(ticketData);
+        })
+        // 3. La suscripción se hace al final de toda la cadena
+      )
+      .subscribe({
+        // El 'next' aquí recibirá el valor emitido por printTicket (el pdfBlob)
+        next: (pdfBlob) => {
+          console.log('Blob del PDF recibido:', pdfBlob); // Este console.log ahora debería funcionar
 
-      // Descargar automáticamente el PDF
-      const url = window.URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'boleta.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+          // Descargar automáticamente el PDF
+          const url = window.URL.createObjectURL(pdfBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'boleta.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
 
-      Swal.fire(
-        '¡Éxito!',
-        'La boleta ha sido vendida y el PDF se ha descargado.',
-        'success'
-      );
-      this.resetForm();
-    },
-    // El 'error' aquí manejará cualquier error en la cadena (de createTicket o printTicket)
-    error: (err) => {
-      console.error('Error en el proceso:', err);
-      Swal.fire('Error', 'No se pudo crear la venta o generar el PDF.', 'error');
-    },
-  });
-}
+          Swal.fire(
+            '¡Éxito!',
+            'La boleta ha sido vendida y el PDF se ha descargado.',
+            'success'
+          );
+          this.resetForm();
+        },
+        // El 'error' aquí manejará cualquier error en la cadena (de createTicket o printTicket)
+        error: (err) => {
+          console.error('Error en el proceso:', err);
+          if (err.error && err.error.message) {
+            Swal.fire('Error', err.error.message, 'error');
+          } else {
+            Swal.fire(
+              'Error',
+              'No se pudo crear la venta o generar el PDF.',
+              'error'
+            );
+          }
+        },
+      });
+  }
 
   resetForm(): void {
     this.newTicket = { customerName: '', plays: [], total: 0 };

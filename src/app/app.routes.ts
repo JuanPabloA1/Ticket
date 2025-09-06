@@ -19,7 +19,7 @@ export const routes: Routes = [
       path: 'historial',
       component: HistorialComponent,
       canActivate: [authGuard], // CORRECTO
-      data: { roles: ['vendedor', 'administrador'] }
+      data: { roles: ['vendedor', 'admin'] }
     },
 
     // Las rutas de redirección NUNCA deben tener canActivate
