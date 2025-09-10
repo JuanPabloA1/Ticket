@@ -1,0 +1,7 @@
+.card {
+  max-width: 600px;
+  margin: auto;
+}
+.invalid-feedback {
+  display: block;
+}

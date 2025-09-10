@@ -3,12 +3,19 @@ import { LoginComponent } from './Vistas/login/login';
 import { VenderComponent } from './Vistas/vender/vender';
 import { HistorialComponent } from './Vistas/historial/historial';
 import { authGuard } from './Servicios/auth-guard';
+import { GestionUsuarios } from './gestion-usuarios/gestion-usuarios';
 
 export const routes: Routes = [
     // La ruta de login NUNCA debe tener canActivate
     { path: 'login', component: LoginComponent },
 
     // Estas SÍ deben estar protegidas
+    {
+      path: 'crearVendedor',
+      component: GestionUsuarios,
+      canActivate: [authGuard], // CORRECTO
+      data: { roles: ['admin'] }
+    },
     {
       path: 'vender',
       component: VenderComponent,

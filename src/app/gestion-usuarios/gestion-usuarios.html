@@ -1,0 +1,90 @@
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">
+      <i class="bi bi-receipt-cutoff me-2"></i>Sistema de Ventas
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/vender">Vender</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" routerLink="/historial">Historial</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle me-1"></i>
+            {{ currentUser?.username || 'Usuario' }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><button class="dropdown-item" (click)="logout()">Cerrar Sesión</button></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">Gestión de Usuarios</h3>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">Crear Nuevo Usuario</h5>
+      <p class="card-text text-muted">Complete el formulario para registrar un nuevo vendedor o supervisor.</p>
+
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <!-- Nombre de usuario -->
+        <div class="mb-3">
+          <label for="username" class="form-label">Nombre del usuario</label>
+          <input type="text" id="username" class="form-control" formControlName="username">
+          <div *ngIf="userForm.get('username')?.hasError('required') && (userForm.get('username')?.touched || userForm.get('username')?.dirty)" class="invalid-feedback">
+            El nombre de usuario es obligatorio.
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <input type="password" id="password" class="form-control" formControlName="password">
+          <div *ngIf="userForm.get('password')?.hasError('required') && (userForm.get('password')?.touched || userForm.get('password')?.dirty)" class="invalid-feedback">
+            La contraseña es obligatoria.
+          </div>
+          <div *ngIf="userForm.get('password')?.hasError('minlength') && (userForm.get('password')?.touched || userForm.get('password')?.dirty)" class="invalid-feedback">
+            La contraseña debe tener al menos 8 caracteres.
+          </div>
+        </div>
+
+        <!-- Rol -->
+        <div class="mb-3">
+          <label for="role" class="form-label">Rol del Usuario</label>
+          <select id="role" class="form-select" formControlName="role"
+            [class.is-invalid]="userForm.get('role')?.invalid && (userForm.get('role')?.touched || userForm.get('role')?.dirty)">
+            <option value="" disabled>Seleccione un rol...</option>
+            <option value="vendedor">Vendedor</option>
+            <option value="supervisor">Supervisor</option>
+            <option value="admin">Administrador</option>
+          </select>
+          <div *ngIf="userForm.get('role')?.hasError('required') && (userForm.get('role')?.touched || userForm.get('role')?.dirty)" class="invalid-feedback">
+            Debe seleccionar un rol.
+          </div>
+        </div>
+
+        <!-- Botón -->
+        <button type="submit" class="btn btn-primary"
+          [disabled]="userForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Creando...' : 'Crear Usuario' }}
+        </button>
+      </form>
+
+      <div *ngIf="message" class="alert alert-success mt-4" role="alert">
+        {{ message }}
+      </div>
+    </div>
+  </div>
+</div>

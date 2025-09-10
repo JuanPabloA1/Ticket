@@ -4,12 +4,12 @@ import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
   private API_URL = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // --- MÉTODOS PÚBLICOS (Sin Token) ---
   login(credentials: any): Observable<any> {
@@ -23,7 +23,7 @@ export class ApiService {
     // --- ¡ESTE ES EL ÚNICO CAMBIO! ---
     // Ahora el formato es "Bearer <token>", que es el estándar profesional.
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
   }
 
@@ -33,27 +33,47 @@ export class ApiService {
     // --- ¡ESTE ES EL ÚNICO CAMBIO! ---
     // Ahora el formato es "Bearer <token>", que es el estándar profesional.
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
-      'Accept': 'application/pdf'
+      Accept: 'application/pdf',
     });
   }
 
   getNumbers(): Observable<any> {
-    return this.http.get(`${this.API_URL}/numbers`, { headers: this.getAuthHeaders() });
+    return this.http.get(`${this.API_URL}/numbers`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
   createTicket(ticketData: any): Observable<any> {
-    return this.http.post(`${this.API_URL}/tickets`, ticketData, { headers: this.getAuthHeaders() });
+    return this.http.post(`${this.API_URL}/tickets`, ticketData, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
   getHistory(): Observable<any> {
-    return this.http.get(`${this.API_URL}/history`, { headers: this.getAuthHeaders() });
+    return this.http.get(`${this.API_URL}/history`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
   printTicket(receiptData: any): Observable<any> {
     // La ruta ahora está unificada
-    return this.http.post<Blob>(`${this.API_URL}/print/pdf`, receiptData, { headers:
-    this.getAuthHeaders2(), responseType: 'blob' as 'json' });
+    return this.http.post<Blob>(`${this.API_URL}/print/pdf`, receiptData, {
+      headers: this.getAuthHeaders2(),
+      responseType: 'blob' as 'json',
+    });
+  }
+
+  createUser(userData: any): Observable<any> {
+    return this.http.post(`${this.API_URL}/users`, userData, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  getUsers(): Observable<any> {
+    return this.http.get(`${this.API_URL}/users`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 }
