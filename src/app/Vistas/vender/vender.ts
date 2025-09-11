@@ -146,21 +146,26 @@ export class VenderComponent implements OnInit {
         next: (pdfBlob) => {
           console.log('Blob del PDF recibido:', pdfBlob); // Este console.log ahora debería funcionar
 
-          // Descargar automáticamente el PDF
+          // Crear URL para el Blob
           const url = window.URL.createObjectURL(pdfBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'boleta.pdf';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
+
+          // Abrir el PDF en una nueva ventana
+          const pdfWindow = window.open(url);
+
+          // Esperar a que cargue y lanzar impresión
+          if (pdfWindow) {
+            pdfWindow.onload = () => {
+              pdfWindow.focus();
+              pdfWindow.print();
+            };
+          }
 
           Swal.fire(
             '¡Éxito!',
-            'La boleta ha sido vendida y el PDF se ha descargado.',
+            'La boleta ha sido vendida y se abrió para imprimir.',
             'success'
           );
+
           this.resetForm();
         },
         // El 'error' aquí manejará cualquier error en la cadena (de createTicket o printTicket)
