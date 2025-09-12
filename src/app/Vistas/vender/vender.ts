@@ -24,6 +24,7 @@ interface Play {
 // Define la estructura para una boleta
 interface Ticket {
   customerName: string;
+  contacto: string; // 👈 nuevo campo
   plays: Play[];
   total: number;
 }
@@ -32,14 +33,19 @@ interface Ticket {
   selector: 'app-vender',
   standalone: true,
   // ¡Añade esta línea de imports!
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './vender.html', // Pronto corregiremos esto también
   styleUrls: ['./vender.css'],
 })
 export class VenderComponent implements OnInit {
   readonly MAX_AMOUNT_PER_NUMBER = 10000;
   public numberAvailability: { number: string; availableAmount: number }[] = [];
-  public newTicket: Ticket = { customerName: '', plays: [], total: 0 };
+  public newTicket: Ticket = {
+    customerName: '',
+    contacto: '',
+    plays: [],
+    total: 0,
+  };
   public currentPlay: Play = { number: '', amount: 0 };
   private API_URL = 'http://localhost:3000/api';
   public currentUser: any = null;
@@ -52,9 +58,10 @@ export class VenderComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchNumbers();
-    const userString = sessionStorage.getItem('loggedInUser');
+    const userString: any = sessionStorage.getItem('loggedInUser');
     if (userString) {
       this.currentUser = JSON.parse(userString);
+      console.log(this.currentUser.username);
     }
   }
 
@@ -124,22 +131,23 @@ export class VenderComponent implements OnInit {
   }
 
   submitTicket(): void {
+    console.log(this.newTicket);
+
     const ticketData = {
       customerName: this.newTicket.customerName,
+      customerPhone: this.newTicket.contacto, // 👈 lo enviamos al backend
       plays: this.newTicket.plays,
       total: this.getTotal(),
+      user: this.currentUser,
     };
 
     this.apiService
       .createTicket(ticketData)
       .pipe(
-        // 1. switchMap recibe la respuesta de createTicket (savedTicketResponse)
         switchMap((savedTicketResponse) => {
           console.log('Venta guardada:', savedTicketResponse);
-          // 2. Y devuelve el siguiente observable que quieres ejecutar
           return this.apiService.printTicket(ticketData);
         })
-        // 3. La suscripción se hace al final de toda la cadena
       )
       .subscribe({
         // El 'next' aquí recibirá el valor emitido por printTicket (el pdfBlob)
@@ -185,12 +193,13 @@ export class VenderComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.newTicket = { customerName: '', plays: [], total: 0 };
+    this.newTicket = { customerName: '', contacto: '', plays: [], total: 0 };
     this.fetchNumbers(); // Recargamos la disponibilidad de los números
   }
 
-  logout(): void {
+  logout(userData: any): void {
     sessionStorage.clear();
+    sessionStorage.setItem('loggedInUser', JSON.stringify(userData));
     this.router.navigate(['/login']);
   }
 }

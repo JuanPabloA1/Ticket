@@ -3,6 +3,7 @@ import { LoginComponent } from './Vistas/login/login';
 import { VenderComponent } from './Vistas/vender/vender';
 import { HistorialComponent } from './Vistas/historial/historial';
 import { authGuard } from './Servicios/auth-guard';
+import { AuthenticationGuard } from './guards/authentication-guard';
 import { GestionUsuarios } from './gestion-usuarios/gestion-usuarios';
 
 export const routes: Routes = [
@@ -13,7 +14,7 @@ export const routes: Routes = [
     {
       path: 'crearVendedor',
       component: GestionUsuarios,
-      canActivate: [authGuard], // CORRECTO
+      canActivate: [AuthenticationGuard], // CORRECTO
       data: { roles: ['admin'] }
     },
     {

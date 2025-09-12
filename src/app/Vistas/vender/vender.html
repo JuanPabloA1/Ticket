@@ -8,23 +8,28 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-center">
+        @if (currentUser?.role === 'Admin') {
         <li class="nav-item">
           <a class="nav-link active" routerLink="/crearVendedor">Crear vendedor</a>
         </li>
+        }
+
         <li class="nav-item">
           <a class="nav-link active" routerLink="/vender">Vender</a>
         </li>
         <li class="nav-item">
           <!-- <a class="nav-link" routerLink="/historial">Historial</a> -->
-          <a class="nav-link" routerLink="/historial" >Historial</a>
+          <a class="nav-link" routerLink="/historial">Historial</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown">
             <i class="bi bi-person-circle me-1"></i>
-            {{ currentUser?.username || 'Usuario' }}
+            {{ currentUser?.username }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><button class="dropdown-item" (click)="logout()">Cerrar Sesión</button></li>
+            <li>
+              <button class="dropdown-item" (click)="logout(currentUser)">Cerrar Sesión</button>
+            </li>
           </ul>
         </li>
       </ul>
@@ -34,7 +39,6 @@
 
 <main class="container-fluid p-4 bg-light vh-100">
   <div class="row g-4 h-100">
-
     <div class="col-lg-7 d-flex flex-column">
       <div class="card flex-grow-1 shadow-sm border-0 rounded-3">
         <div class="card-body p-4">
@@ -45,12 +49,14 @@
           <form #ticketForm="ngForm" (ngSubmit)="submitTicket()">
             <div class="mb-3">
               <label for="customerName" class="form-label">Nombre del Cliente</label>
-              <input type="text" id="customerName" name="customerName" class="form-control" [(ngModel)]="newTicket.customerName" required>
+              <input type="text" id="customerName" name="customerName" class="form-control"
+                [(ngModel)]="newTicket.customerName" required>
             </div>
 
             <div class="mb-3">
               <label for="contacto" class="form-label">Contacto</label>
-              <input type="number" id="contacto" name="contacto" class="form-control">
+              <input type="number" id="contacto" name="contacto" class="form-control" [(ngModel)]="newTicket.contacto"
+                required>
             </div>
 
             <fieldset class="border p-3 rounded-3 mb-4">
@@ -58,23 +64,27 @@
               <div class="row g-2 align-items-end">
                 <div class="col-5">
                   <label for="number" class="form-label">Número</label>
-                  <input type="text" id="number" name="number" class="form-control" [(ngModel)]="currentPlay.number" placeholder="Ej: 25">
+                  <input type="text" id="number" inputmode="numeric" pattern="[0-9]*" name="number" class="form-control" [(ngModel)]="currentPlay.number"
+                    placeholder="Ej: 25">
                 </div>
                 <div class="col-5">
                   <label for="amount" class="form-label">Monto</label>
-                  <input value="" type="number" id="amount" name="amount" class="form-control" [(ngModel)]="currentPlay.amount" placeholder="Ej: 1000">
+                  <input value="" type="number" id="amount" name="amount" class="form-control"
+                    [(ngModel)]="currentPlay.amount" placeholder="Ej: 1000">
                 </div>
-                <div class="col-2 d-grid">
-                  <button type="button" class="btn btn-secondary" (click)="addPlay()" [disabled]="!currentPlay.number || !currentPlay.amount">
-                    <i class="bi bi-plus-lg">Generar</i>
-                  </button>
-                </div>
+              </div>
+              <div class="col-2 mx-auto mt-3">
+                <button type="button" class="btn btn-secondary" (click)="addPlay()"
+                  [disabled]="!currentPlay.number || !currentPlay.amount">
+                  <i class="bi bi-plus-lg">Generar</i>
+                </button>
               </div>
             </fieldset>
 
             <h3 class="h6 mb-3">Jugadas en esta Boleta</h3>
             <ul class="list-group mb-3" *ngIf="newTicket.plays.length > 0; else noPlays">
-              <li *ngFor="let play of newTicket.plays; let i = index" class="list-group-item d-flex justify-content-between align-items-center">
+              <li *ngFor="let play of newTicket.plays; let i = index"
+                class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
                   <span class="fw-bold">Número: {{ play.number }}</span>
                   <span class="text-muted ms-3">Monto: {{ play.amount | currency:'COP':'$':'1.0-0' }}</span>
@@ -93,11 +103,12 @@
             </ng-template>
 
             @if (ticketForm.invalid) {
-              <div class="alert alert-danger text-center">Falta digitar el nombre del cliente.</div>
+            <div class="alert alert-danger text-center">Falta digitar el nombre del cliente.</div>
             }
 
             <div class="d-grid mt-4">
-              <button type="submit" class="btn btn-primary btn-lg" [disabled]="ticketForm.invalid || newTicket.plays.length === 0">
+              <button type="submit" class="btn btn-primary btn-lg"
+                [disabled]="ticketForm.invalid || newTicket.plays.length === 0">
                 Vender e Imprimir Boleta
               </button>
             </div>
